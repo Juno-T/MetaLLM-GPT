@@ -7,11 +7,6 @@ from langchain.prompts import (
     AIMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
-from langchain.schema import (
-    AIMessage,
-    HumanMessage,
-    SystemMessage,
-)
 
 from base_modules.interface import CodeBlob
 from base_modules.prompts.common import format_prompt_template

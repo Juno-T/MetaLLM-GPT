@@ -5,7 +5,7 @@ import openai
 from langchain.chat_models import ChatOpenAI
 
 from base_modules.inqury import GPT_turbo
-from base_modules.prompt import prompt_settings
+from base_modules.prompts.default import prompt_settings
 from base_modules.code_management import meta_python
 from base_modules.code_management import overtime_kill, execute
 from base_modules.interface import CodeBlob
