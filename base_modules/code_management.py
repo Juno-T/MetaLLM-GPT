@@ -1,34 +1,35 @@
 import io
+import time
 from contextlib import redirect_stdout
 import traceback
 import multiprocessing
+from pathlib import Path
 
 from base_modules.interface import CodeBlob
-import time
 
 
-class meta_python():
-
-    def __init__(self, File_path, Output=None, Verbose=False):
-        self.File_path = File_path
-        self.Verbose = Verbose
-        self.Output = Output
+class FileManager():
+    def __init__(self, file_path, output=None, verbose=False):
+        self.file_path = file_path
+        self.verbose = verbose
+        self.output = output
 
     def read(self):
-        file = open(self.File_path, "r")
+        file = open(self.file_path, "r")
         line_list = file.readlines()
-        if self.Verbose:
+        if self.verbose:
             print("raw string line by line:")
             for line in line_list:
                 print(repr(line))
         combined_raw_code = "".join(str(item) for item in line_list)
-        if self.Verbose:
+        if self.verbose:
             print("raw string combined:")
             print("combined raw code", repr(combined_raw_code))
         return combined_raw_code
 
     def write(self, the_code):
-        f = open(self.File_path, "w")
+        Path(self.file_path).parent.mkdir(parents=True, exist_ok=True)
+        f = open(self.file_path, "w")
         f.write(the_code)
         f.close()
 
@@ -86,7 +87,7 @@ def execute(
         ret_dict["buggy"] = True
     
 
-def overtime_kill(target_function, target_function_args=None, time_limit=60, ret=True):
+def overtime_kill(target_function, target_function_args=None, time_limit=60, ret=True, overhead_s = 2):
     # converting this function into a decorator might make it less convenient
 
     ret_dict = multiprocessing.Manager().dict()
@@ -99,9 +100,9 @@ def overtime_kill(target_function, target_function_args=None, time_limit=60, ret
         p = multiprocessing.Process(target=target_function)
 
     p.start()
-    p.join(time_limit)
+    p.join(overhead_s + time_limit)
     if p.is_alive():
-        print(f"The execution of the code takes longer than {time_limit} seconds, terminating the execution...")
+        print(f"The execution of the code takes longer than {overhead_s + time_limit} seconds, terminating the execution...")
         p.terminate()
         p.join()
         killed = True

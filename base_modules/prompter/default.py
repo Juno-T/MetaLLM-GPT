@@ -8,7 +8,7 @@ from langchain.prompts import (
 from langchain.schema import PromptValue
 
 from base_modules.interface import CodeBlob
-from base_modules.prompts.common import format_prompt_template
+from base_modules.prompter.common import format_prompt_template
 
 base_prompt = ChatPromptTemplate.from_messages([SystemMessagePromptTemplate.from_template("""
 You are a programming expert.
@@ -127,12 +127,12 @@ The code {code} takes too long to run, modify the code so that it takes shorter 
 ])
 
 class prompt_settings:
-    def __init__(self, Input, Output, Objective, Privilege, Environment):
-        self.Input = Input
-        self.Output = Output
-        self.Objective = Objective
-        self.Privilege = Privilege
-        self.Environment = Environment
+    def __init__(self, input, output, objective, privilege, environment):
+        self.input = input
+        self.output = output
+        self.objective = objective
+        self.privilege = privilege
+        self.environment = environment
 
     def generate_prompt(self, prev_codeblob: Optional[CodeBlob]=None) -> PromptValue:
         prompt = self.construct_base_prompt()
@@ -150,7 +150,7 @@ class prompt_settings:
             prompt += debug_prompt
 
         if Mode == "Improve":
-            if self.Output is not None:
+            if self.output is not None:
                 prompt += improve_prompt_with_output
             else:
                 prompt += improve_prompt_without_output
@@ -164,25 +164,41 @@ class prompt_settings:
         return format_prompt_template(
             prompt, 
             prev_codeblob, 
-            objective=self.Objective,
-            input=self.Input,
-            output=self.Output,
-            environment=self.Environment,)
+            objective=self.objective,
+            input=self.input,
+            output=self.output,
+            environment=self.environment,)
 
     def construct_base_prompt(self):
         prompt = deepcopy(base_prompt)
-        if self.Input is not None:
+        if self.input is not None:
             prompt += input_prompt
 
-        if self.Output is not None:
+        if self.output is not None:
             prompt += input_prompt
 
-        if self.Privilege:
+        if self.privilege:
             prompt += privilege_prompt
         else:
             prompt += not_privilege_prompt
-            if self.Environment is None:
+            if self.environment is None:
                 prompt += not_environment_prompt
             else:
                 prompt += environment_prompt
         return prompt
+
+    def parse_code(self, response: str) -> str:
+        try:
+            sub1 = "```python"
+            idx1 = response.index(sub1)
+        except:
+            try:
+                sub1 = "``` python"
+                idx1 = response.index(sub1)
+            except:
+                sub1 = "```"
+                idx1 = response.index(sub1)
+        sub2 = "```"
+        idx2 = response.index(sub2, idx1 + 1, )
+        extraction = response[idx1 + len(sub1) + 1: idx2]
+        return extraction
