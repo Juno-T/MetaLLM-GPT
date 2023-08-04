@@ -1,5 +1,5 @@
 from base_modules.interface import CodeBlob
-from base_modules.prompts.default import prompt_settings
+from base_modules.prompter.default import prompt_settings
 from langchain.schema import PromptValue
 
 from .base import type_check, handling_codeblobs

@@ -1,8 +1,7 @@
 from base_modules.interface import CodeBlob
-from base_modules.prompts.default import prompt_settings
 from langchain.schema import PromptValue
 
-def type_check(prompter: prompt_settings):
+def type_check(prompter):
     codeblob = CodeBlob(
         code="my_code",
         stdout="my_stdout",
@@ -16,7 +15,7 @@ def type_check(prompter: prompt_settings):
     prompt = prompter.generate_prompt(codeblob)
     assert isinstance(prompt, PromptValue)
 
-def handling_codeblobs(prompter: prompt_settings):
+def handling_codeblobs(prompter):
     codeblob_cases = [
         # Bug-free
         CodeBlob(

@@ -2,11 +2,10 @@ from typing import Optional
 from copy import deepcopy
 from langchain.prompts import (
     ChatPromptTemplate,
-    PromptTemplate,
     SystemMessagePromptTemplate,
-    AIMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
+from langchain.schema import PromptValue
 
 from base_modules.interface import CodeBlob
 from base_modules.prompts.common import format_prompt_template
@@ -135,7 +134,7 @@ class prompt_settings:
         self.Privilege = Privilege
         self.Environment = Environment
 
-    def generate_prompt(self, prev_codeblob: Optional[CodeBlob]=None):
+    def generate_prompt(self, prev_codeblob: Optional[CodeBlob]=None) -> PromptValue:
         prompt = self.construct_base_prompt()
         if prev_codeblob is not None:
             if prev_codeblob.execution_killed:

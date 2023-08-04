@@ -5,7 +5,7 @@ import openai
 from langchain.chat_models import ChatOpenAI
 
 from base_modules.inqury import GPT_turbo
-from base_modules.prompts.default import prompt_settings
+from base_modules.prompter.default import prompt_settings
 from base_modules.code_management import meta_python
 from base_modules.code_management import overtime_kill, execute
 from base_modules.interface import CodeBlob
@@ -46,8 +46,7 @@ class MetaLLM_GPT:
 
         self.llm = ChatOpenAI(model=self.model, openai_api_key=self.Key, max_retries=1, max_tokens=None)
         self.meta_instance = meta_python(self.File_path, Output=self.Output, Verbose=self.Verbose)
-        self.prompt = prompt_settings(self.Input, self.Output, self.Objective, self.Privilege, self.Environment)
-        self.prompt.input_and_output_type()
+        self.prompter = prompt_settings(self.Input, self.Output, self.Objective, self.Privilege, self.Environment)
 
     def run(self):
         self.result_length_sufficient = False
@@ -86,7 +85,7 @@ class MetaLLM_GPT:
                     print("Begin creating the code")
 
                 print("Thinking right now...")
-                prompt = self.prompt.generate_prompt(codeblob)
+                prompt = self.prompter.generate_prompt(codeblob).to_messages()
                 response_txt = self.call_LLM(prompt)
 
                 retrieved_code = self.retrieve_code_and_test_length(response_txt)
